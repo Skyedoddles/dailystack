@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DailyStack — Todo &amp; Timer</title>
-<meta name="description" content="A floral pink and baby blue todo checklist with a built-in focus timer.">
+<title>DailyStack — Notebook</title>
+<meta name="description" content="A handwritten-feel notebook todo list with per-task time tracking, pink and baby blue floral accents.">
 <meta name="theme-color" content="#ff8fab">
 
 <link rel="manifest" href="manifest.json">
@@ -16,6 +16,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --pink: #ffb6c1;
@@ -24,7 +28,7 @@
     --baby-blue: #a7d8f0;
     --baby-blue-dark: #7ec4e8;
     --blue-deep: #4fb0e0;
-    --bg: #fff5f8;
+    --bg: #fffbf5;
     --card: #ffffff;
     --text: #4a3b45;
     --text-soft: #8a7a85;
@@ -32,18 +36,18 @@
     --done: #c9c0c6;
     --page-grad-a: var(--baby-blue);
     --page-grad-b: var(--pink);
-    --timer-grad-a: var(--baby-blue);
-    --timer-grad-b: var(--baby-blue-dark);
     --shadow-tint: rgba(255, 143, 171, 0.35);
     --widget-border: #fff;
     --bloom-pink-fill: #ffe3ec;
     --bloom-pink-stroke: #ff9dbb;
     --bloom-blue-fill: #d7f0ff;
     --bloom-blue-stroke: #8fd0f2;
-    --ring-track: #f0eef2;
     --input-bg: #ffffff;
     --page-glow-a: rgba(255,255,255,0.5);
     --page-glow-b: rgba(255,255,255,0.4);
+    --paper-line: rgba(127, 166, 199, 0.35);
+    --paper-margin: rgba(255, 111, 156, 0.35);
+    --binding-hole: var(--bg);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -62,18 +66,17 @@
       --done: #7a6a76;
       --page-grad-a: #1f2a3d;
       --page-grad-b: #3a2436;
-      --timer-grad-a: #223a52;
-      --timer-grad-b: #182838;
       --shadow-tint: rgba(0, 0, 0, 0.55);
       --widget-border: #3a2c40;
       --bloom-pink-fill: #4a2f3c;
       --bloom-pink-stroke: #a85d7c;
       --bloom-blue-fill: #24384a;
       --bloom-blue-stroke: #5590b8;
-      --ring-track: #3a2c40;
       --input-bg: #362a3c;
       --page-glow-a: rgba(255,255,255,0.06);
       --page-glow-b: rgba(255,255,255,0.05);
+      --paper-line: rgba(111, 168, 214, 0.25);
+      --paper-margin: rgba(255, 136, 172, 0.3);
     }
   }
 
@@ -92,18 +95,17 @@
     --done: #7a6a76;
     --page-grad-a: #1f2a3d;
     --page-grad-b: #3a2436;
-    --timer-grad-a: #223a52;
-    --timer-grad-b: #182838;
     --shadow-tint: rgba(0, 0, 0, 0.55);
     --widget-border: #3a2c40;
     --bloom-pink-fill: #4a2f3c;
     --bloom-pink-stroke: #a85d7c;
     --bloom-blue-fill: #24384a;
     --bloom-blue-stroke: #5590b8;
-    --ring-track: #3a2c40;
     --input-bg: #362a3c;
     --page-glow-a: rgba(255,255,255,0.06);
     --page-glow-b: rgba(255,255,255,0.05);
+    --paper-line: rgba(111, 168, 214, 0.25);
+    --paper-margin: rgba(255, 136, 172, 0.3);
   }
 
   * { box-sizing: border-box; }
@@ -174,11 +176,10 @@
 
   .widget {
     width: 100%;
-    max-width: 680px;
+    max-width: 620px;
     background: var(--bg);
     border-radius: 28px;
     box-shadow: 0 20px 50px var(--shadow-tint);
-    display: flex;
     overflow: hidden;
     border: 3px solid var(--widget-border);
     position: relative;
@@ -186,119 +187,283 @@
     transition: background 0.25s ease, border-color 0.25s ease;
   }
 
-  @media (max-width: 560px) {
-    .widget { flex-direction: column; }
-  }
-
-  /* ---------- Timer side panel ---------- */
-  .timer-panel {
-    background: linear-gradient(180deg, var(--timer-grad-a) 0%, var(--timer-grad-b) 100%);
-    width: 220px;
-    flex-shrink: 0;
-    padding: 28px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--text);
-    transition: background 0.25s ease;
-  }
-
-  @media (max-width: 560px) {
-    .timer-panel { width: 100%; }
-  }
-
-  .timer-panel h2 {
-    font-size: 15px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin: 0 0 18px;
-    color: var(--text);
-    font-weight: 700;
-    opacity: 0.85;
-  }
-
-  .timer-ring {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: var(--card);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 18px rgba(79, 176, 224, 0.35);
-    position: relative;
-    margin-bottom: 18px;
-    transition: background 0.25s ease;
-  }
-
-  .timer-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
-
-  .timer-display {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--pink-deep);
+  /* spiral-notebook binding strip along the left edge */
+  .widget::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 26px;
+    background-image: radial-gradient(circle, var(--binding-hole) 4px, transparent 4.5px);
+    background-size: 26px 30px;
+    background-position: 13px 14px;
+    border-right: 1px dashed var(--border);
     z-index: 1;
-    font-variant-numeric: tabular-nums;
   }
 
-  .timer-controls {
+  .notebook-page {
+    padding: 26px 22px 26px 48px;
+    position: relative;
+  }
+
+  /* red/pink margin rule */
+  .notebook-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 40px;
+    width: 2px;
+    background: var(--paper-margin);
+  }
+
+  .todo-header {
     display: flex;
-    gap: 8px;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2px;
+  }
+
+  .todo-header h1 {
+    font-family: 'Caveat', cursive;
+    font-size: 34px;
+    margin: 0;
+    color: var(--pink-deep);
+    font-weight: 700;
+  }
+
+  .todo-count {
+    font-size: 12px;
+    color: #fff;
+    background: var(--pink);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .todo-sub {
+    font-size: 12px;
+    color: var(--text-soft);
     margin-bottom: 14px;
   }
 
-  .timer-controls button {
-    border: none;
-    border-radius: 12px;
-    padding: 9px 14px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    background: var(--card);
-    color: var(--blue-deep);
-    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-    transition: transform 0.15s ease, background 0.15s ease;
+  .floral-divider {
+    display: block;
+    width: 100%;
+    height: 14px;
+    margin: 2px 0 14px;
+    opacity: 0.8;
   }
 
-  .timer-controls button:hover { transform: translateY(-1px); }
+  .add-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px dashed var(--paper-line);
+  }
 
-  .timer-controls button.primary {
+  .add-row input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    padding: 6px 2px;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 19px;
+    outline: none;
+    color: var(--text);
+  }
+
+  .add-row input::placeholder { color: var(--text-soft); opacity: 0.7; }
+
+  .add-row button {
+    border: none;
     background: var(--pink-deep);
     color: #fff;
-  }
-
-  .timer-presets {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .timer-presets button {
-    border: 1px solid rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.15);
-    color: var(--text);
-    border-radius: 10px;
-    padding: 5px 9px;
-    font-size: 11px;
-    font-weight: 600;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    font-size: 18px;
+    font-weight: 700;
     cursor: pointer;
+    line-height: 1;
   }
 
-  .timer-presets button.active {
+  .add-row button:hover { background: var(--blue-deep); }
+
+  .todo-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    max-height: 420px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .todo-list::-webkit-scrollbar { width: 6px; }
+  .todo-list::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 4px; }
+
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 2px;
+    border-bottom: 1px dashed var(--paper-line);
+  }
+
+  .todo-item.done { opacity: 0.6; }
+
+  .checkbox {
+    width: 21px;
+    height: 21px;
+    border-radius: 6px;
+    border: 2px solid var(--baby-blue-dark);
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--input-bg);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .checkbox.checked {
+    background: var(--pink-deep);
+    border-color: var(--pink-deep);
+  }
+
+  .checkbox.checked::after {
+    content: "✿";
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .todo-text {
+    flex: 1;
+    min-width: 0;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 18px;
+    line-height: 1.25;
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  .todo-item.done .todo-text {
+    text-decoration: line-through;
+    color: var(--done);
+  }
+
+  .task-timer {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .task-timer-time {
+    font-size: 11px;
+    color: var(--text-soft);
+    min-width: 36px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .task-timer-btn {
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
     background: var(--card);
     color: var(--blue-deep);
+    font-size: 11px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
 
-  /* ---------- Calendar section ---------- */
-  .panel-divider {
+  .task-timer-btn.running {
+    background: var(--pink-deep);
+    color: #fff;
+    animation: timerPulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes timerPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 111, 156, 0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(255, 111, 156, 0); }
+  }
+
+  .cal-add-btn, .delete-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-soft);
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 4px;
+    border-radius: 8px;
+  }
+
+  .cal-add-btn:hover { background: var(--pink); color: #fff; }
+  .cal-add-btn.added { color: var(--pink-deep); }
+  .delete-btn:hover { background: var(--baby-blue); color: #234; }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-soft);
+    font-family: 'Patrick Hand', cursive;
+    font-size: 16px;
+    padding: 26px 10px;
+  }
+
+  .progress-track {
+    margin-top: 14px;
+    height: 8px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--baby-blue-dark), var(--pink-deep));
+    width: 0%;
+    transition: width 0.25s ease;
+  }
+
+  /* ---------- Calendar section (collapsible) ---------- */
+  .cal-toggle-btn {
     width: 100%;
-    height: 1px;
-    background: rgba(255,255,255,0.25);
-    margin: 22px 0 18px;
+    margin-top: 16px;
+    border: none;
+    background: rgba(127, 166, 199, 0.15);
+    color: var(--text);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 9px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
   }
 
-  .calendar-section { width: 100%; }
+  .cal-toggle-btn:hover { background: rgba(127, 166, 199, 0.28); }
+
+  .calendar-section {
+    margin-top: 10px;
+    background: rgba(127, 166, 199, 0.1);
+    border-radius: 12px;
+    padding: 12px;
+  }
 
   .cal-title-row {
     display: flex;
@@ -307,11 +472,16 @@
     margin-bottom: 10px;
   }
 
-  .cal-title-row h2 { margin: 0; }
+  .cal-title-row h2 {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
 
   .cal-gear {
     border: none;
-    background: rgba(255,255,255,0.3);
+    background: rgba(127, 166, 199, 0.25);
     color: var(--text);
     width: 24px;
     height: 24px;
@@ -321,10 +491,10 @@
     line-height: 1;
   }
 
-  .cal-gear:hover { background: rgba(255,255,255,0.5); }
+  .cal-gear:hover { background: rgba(127, 166, 199, 0.4); }
 
   .cal-setup {
-    background: rgba(255,255,255,0.35);
+    background: var(--card);
     border-radius: 12px;
     padding: 10px;
     font-size: 11px;
@@ -333,11 +503,11 @@
     margin-bottom: 10px;
   }
 
-  .cal-setup a { color: var(--text); font-weight: 700; }
+  .cal-setup a { color: var(--pink-deep); font-weight: 700; }
 
   .cal-setup input {
     width: 100%;
-    border: none;
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 7px 9px;
     font-size: 11px;
@@ -396,7 +566,7 @@
 
   .cal-status button {
     border: none;
-    background: rgba(255,255,255,0.3);
+    background: rgba(127, 166, 199, 0.25);
     color: var(--text);
     border-radius: 6px;
     padding: 2px 6px;
@@ -441,210 +611,13 @@
   .cal-refresh-btn {
     width: 100%;
     border: none;
-    background: rgba(255,255,255,0.3);
+    background: rgba(127, 166, 199, 0.25);
     color: var(--text);
     font-size: 11px;
     font-weight: 600;
     padding: 6px;
     border-radius: 8px;
     cursor: pointer;
-  }
-
-  .cal-add-btn {
-    border: none;
-    background: transparent;
-    color: var(--text-soft);
-    font-size: 14px;
-    cursor: pointer;
-    flex-shrink: 0;
-    padding: 4px;
-    border-radius: 8px;
-  }
-
-  .cal-add-btn:hover { background: var(--pink); color: #fff; }
-  .cal-add-btn.added { color: var(--pink-deep); }
-
-  /* ---------- Todo main panel ---------- */
-  .todo-panel {
-    flex: 1;
-    padding: 28px 26px;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-
-  .todo-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 4px;
-  }
-
-  .todo-header h1 {
-    font-size: 20px;
-    margin: 0;
-    color: var(--pink-deep);
-    font-weight: 800;
-  }
-
-  .todo-count {
-    font-size: 12px;
-    color: var(--text-soft);
-    background: var(--pink);
-    padding: 3px 10px;
-    border-radius: 999px;
-    color: #fff;
-    font-weight: 700;
-  }
-
-  .todo-sub {
-    font-size: 12px;
-    color: var(--text-soft);
-    margin-bottom: 18px;
-  }
-
-  .add-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .add-row input {
-    flex: 1;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 10px 14px;
-    font-size: 14px;
-    outline: none;
-    background: var(--input-bg);
-    color: var(--text);
-    transition: background 0.25s ease, border-color 0.25s ease;
-  }
-
-  .add-row input:focus { border-color: var(--baby-blue-dark); }
-
-  .add-row button {
-    border: none;
-    background: var(--pink-deep);
-    color: #fff;
-    border-radius: 12px;
-    padding: 0 18px;
-    font-size: 20px;
-    font-weight: 700;
-    cursor: pointer;
-    line-height: 1;
-  }
-
-  .add-row button:hover { background: var(--blue-deep); }
-
-  .todo-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    overflow-y: auto;
-    max-height: 340px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .todo-list::-webkit-scrollbar { width: 6px; }
-  .todo-list::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 4px; }
-
-  .todo-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 10px 12px;
-    transition: background 0.25s ease, border-color 0.25s ease;
-  }
-
-  .todo-item.done {
-    opacity: 0.72;
-  }
-
-  .checkbox {
-    width: 22px;
-    height: 22px;
-    border-radius: 7px;
-    border: 2px solid var(--baby-blue-dark);
-    flex-shrink: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--input-bg);
-    transition: background 0.15s ease, border-color 0.15s ease;
-  }
-
-  .checkbox.checked {
-    background: var(--pink-deep);
-    border-color: var(--pink-deep);
-  }
-
-  .checkbox.checked::after {
-    content: "✿";
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-  }
-
-  .floral-divider {
-    display: block;
-    width: 100%;
-    height: 14px;
-    margin: 2px 0 16px;
-    opacity: 0.8;
-  }
-
-  .todo-text {
-    flex: 1;
-    font-size: 14px;
-    color: var(--text);
-    word-break: break-word;
-  }
-
-  .todo-item.done .todo-text {
-    text-decoration: line-through;
-    color: var(--done);
-  }
-
-  .delete-btn {
-    border: none;
-    background: transparent;
-    color: var(--text-soft);
-    font-size: 16px;
-    cursor: pointer;
-    flex-shrink: 0;
-    padding: 4px;
-    border-radius: 8px;
-  }
-
-  .delete-btn:hover { background: var(--baby-blue); color: #234; }
-
-  .empty-state {
-    text-align: center;
-    color: var(--text-soft);
-    font-size: 13px;
-    padding: 30px 10px;
-  }
-
-  .progress-track {
-    margin-top: 16px;
-    height: 8px;
-    background: var(--border);
-    border-radius: 999px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--baby-blue-dark), var(--pink-deep));
-    width: 0%;
-    transition: width 0.25s ease;
   }
 </style>
 </head>
@@ -695,32 +668,38 @@
 <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
 
 <div class="widget">
-  <div class="timer-panel">
-    <h2>🌸 Focus Timer</h2>
-    <div class="timer-ring">
-      <svg width="150" height="150">
-        <circle cx="75" cy="75" r="66" stroke="var(--ring-track)" stroke-width="10" fill="none"></circle>
-        <circle id="ringProgress" cx="75" cy="75" r="66" stroke="var(--pink-deep)" stroke-width="10" fill="none"
-                stroke-linecap="round" stroke-dasharray="414.7" stroke-dashoffset="0"></circle>
-      </svg>
-      <div class="timer-display" id="timerDisplay">25:00</div>
+  <div class="notebook-page">
+    <div class="todo-header">
+      <h1>🌷 Today's Notebook</h1>
+      <span class="todo-count" id="todoCount">0/0</span>
     </div>
-    <div class="timer-controls">
-      <button id="startPauseBtn" class="primary">Start</button>
-      <button id="resetBtn">Reset</button>
-    </div>
-    <div class="timer-presets">
-      <button data-min="5">5m</button>
-      <button data-min="15">15m</button>
-      <button data-min="25" class="active">25m</button>
-      <button data-min="45">45m</button>
+    <div class="todo-sub">Write it, check it off, track your time 🩷</div>
+
+    <svg class="floral-divider" viewBox="0 0 300 14" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 7 H300" stroke="var(--border)" stroke-width="2"/>
+      <circle cx="20" cy="7" r="4" fill="var(--pink)"/>
+      <circle cx="90" cy="7" r="3" fill="var(--baby-blue)"/>
+      <circle cx="160" cy="7" r="4" fill="var(--pink)"/>
+      <circle cx="230" cy="7" r="3" fill="var(--baby-blue)"/>
+      <circle cx="285" cy="7" r="4" fill="var(--pink)"/>
+    </svg>
+
+    <div class="add-row">
+      <input type="text" id="taskInput" placeholder="Write a new task..." maxlength="140">
+      <button id="addBtn">+</button>
     </div>
 
-    <div class="panel-divider"></div>
+    <ul class="todo-list" id="todoList"></ul>
 
-    <div class="calendar-section">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <button class="cal-toggle-btn" id="calToggleBtn">📅 Calendar</button>
+
+    <div class="calendar-section" id="calendarSection" hidden>
       <div class="cal-title-row">
-        <h2>📅 Calendar</h2>
+        <h2>Today's events</h2>
         <button class="cal-gear" id="calGearBtn" title="Calendar setup">⚙</button>
       </div>
 
@@ -749,39 +728,12 @@
       </div>
     </div>
   </div>
-
-  <div class="todo-panel">
-    <div class="todo-header">
-      <h1>🌷 Today's Checklist</h1>
-      <span class="todo-count" id="todoCount">0/0</span>
-    </div>
-    <div class="todo-sub">Stay on task while the timer runs 🩷</div>
-
-    <svg class="floral-divider" viewBox="0 0 300 14" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0 7 H300" stroke="var(--border)" stroke-width="2"/>
-      <circle cx="20" cy="7" r="4" fill="var(--pink)"/>
-      <circle cx="90" cy="7" r="3" fill="var(--baby-blue)"/>
-      <circle cx="160" cy="7" r="4" fill="var(--pink)"/>
-      <circle cx="230" cy="7" r="3" fill="var(--baby-blue)"/>
-      <circle cx="285" cy="7" r="4" fill="var(--pink)"/>
-    </svg>
-
-    <div class="add-row">
-      <input type="text" id="taskInput" placeholder="Add a task..." maxlength="140">
-      <button id="addBtn">+</button>
-    </div>
-
-    <ul class="todo-list" id="todoList"></ul>
-
-    <div class="progress-track">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-  </div>
 </div>
 
 <script>
   // ---------- Todo / checklist logic ----------
   const STORAGE_KEY = 'dailystack_widget_todos';
+  const ACTIVE_TIMER_KEY = 'dailystack_active_timer';
   const todoList = document.getElementById('todoList');
   const taskInput = document.getElementById('taskInput');
   const addBtn = document.getElementById('addBtn');
@@ -789,11 +741,14 @@
   const progressFill = document.getElementById('progressFill');
 
   let todos = loadTodos();
+  let activeTimer = loadActiveTimer(); // { id, startedAt } or null
+  let tickIntervalId = null;
 
   function loadTodos() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const parsed = raw ? JSON.parse(raw) : [];
+      return parsed.map(t => ({ elapsedSeconds: 0, ...t }));
     } catch (e) {
       return [];
     }
@@ -805,13 +760,51 @@
     } catch (e) { /* storage unavailable */ }
   }
 
+  function loadActiveTimer() {
+    try {
+      const raw = localStorage.getItem(ACTIVE_TIMER_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveActiveTimer() {
+    try {
+      if (activeTimer) {
+        localStorage.setItem(ACTIVE_TIMER_KEY, JSON.stringify(activeTimer));
+      } else {
+        localStorage.removeItem(ACTIVE_TIMER_KEY);
+      }
+    } catch (e) { /* storage unavailable */ }
+  }
+
+  function formatElapsed(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    if (h > 0) {
+      return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    }
+    return `${m}:${String(sec).padStart(2, '0')}`;
+  }
+
+  function liveElapsedFor(todo) {
+    let seconds = todo.elapsedSeconds || 0;
+    if (activeTimer && activeTimer.id === todo.id) {
+      seconds += (Date.now() - activeTimer.startedAt) / 1000;
+    }
+    return seconds;
+  }
+
   function renderTodos() {
     todoList.innerHTML = '';
 
     if (todos.length === 0) {
       const empty = document.createElement('li');
       empty.className = 'empty-state';
-      empty.textContent = 'No tasks yet — add your first one above.';
+      empty.textContent = 'Nothing written yet — add your first task above.';
       todoList.appendChild(empty);
     }
 
@@ -827,6 +820,25 @@
       text.className = 'todo-text';
       text.textContent = todo.text;
 
+      const timerWrap = document.createElement('div');
+      timerWrap.className = 'task-timer';
+
+      const isRunning = activeTimer && activeTimer.id === todo.id;
+
+      const timerBtn = document.createElement('button');
+      timerBtn.className = 'task-timer-btn' + (isRunning ? ' running' : '');
+      timerBtn.title = isRunning ? 'Pause timer' : 'Start timer';
+      timerBtn.textContent = isRunning ? '⏸' : '▶';
+      timerBtn.addEventListener('click', () => toggleTaskTimer(todo.id));
+
+      const timerLabel = document.createElement('span');
+      timerLabel.className = 'task-timer-time';
+      timerLabel.dataset.timerLabel = todo.id;
+      timerLabel.textContent = formatElapsed(liveElapsedFor(todo));
+
+      timerWrap.appendChild(timerBtn);
+      timerWrap.appendChild(timerLabel);
+
       const calBtn = document.createElement('button');
       calBtn.className = 'cal-add-btn';
       calBtn.title = 'Add to calendar';
@@ -840,6 +852,7 @@
 
       li.appendChild(checkbox);
       li.appendChild(text);
+      li.appendChild(timerWrap);
       li.appendChild(calBtn);
       li.appendChild(del);
       todoList.appendChild(li);
@@ -848,12 +861,14 @@
     const doneCount = todos.filter(t => t.done).length;
     todoCount.textContent = `${doneCount}/${todos.length}`;
     progressFill.style.width = todos.length ? `${(doneCount / todos.length) * 100}%` : '0%';
+
+    manageTickInterval();
   }
 
   function addTodo() {
     const value = taskInput.value.trim();
     if (!value) return;
-    todos.push({ id: Date.now(), text: value, done: false });
+    todos.push({ id: Date.now(), text: value, done: false, elapsedSeconds: 0 });
     taskInput.value = '';
     saveTodos();
     renderTodos();
@@ -861,12 +876,20 @@
 
   function toggleTodo(id) {
     const todo = todos.find(t => t.id === id);
-    if (todo) todo.done = !todo.done;
+    if (!todo) return;
+    todo.done = !todo.done;
+    if (todo.done && activeTimer && activeTimer.id === id) {
+      stopActiveTimer();
+    }
     saveTodos();
     renderTodos();
   }
 
   function deleteTodo(id) {
+    if (activeTimer && activeTimer.id === id) {
+      activeTimer = null;
+      saveActiveTimer();
+    }
     todos = todos.filter(t => t.id !== id);
     saveTodos();
     renderTodos();
@@ -877,79 +900,53 @@
     if (e.key === 'Enter') addTodo();
   });
 
-  renderTodos();
-
-  // ---------- Timer logic ----------
-  const timerDisplay = document.getElementById('timerDisplay');
-  const startPauseBtn = document.getElementById('startPauseBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const ringProgress = document.getElementById('ringProgress');
-  const presetButtons = document.querySelectorAll('.timer-presets button');
-  const CIRCUMFERENCE = 2 * Math.PI * 66;
-
-  let totalSeconds = 25 * 60;
-  let remainingSeconds = totalSeconds;
-  let intervalId = null;
-  let isRunning = false;
-
-  function formatTime(seconds) {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
+  // ---------- Per-task time tracking ----------
+  function startTaskTimer(id) {
+    if (activeTimer && activeTimer.id === id) return;
+    if (activeTimer) stopActiveTimer();
+    activeTimer = { id, startedAt: Date.now() };
+    saveActiveTimer();
+    renderTodos();
   }
 
-  function updateDisplay() {
-    timerDisplay.textContent = formatTime(remainingSeconds);
-    const fraction = remainingSeconds / totalSeconds;
-    ringProgress.style.strokeDashoffset = CIRCUMFERENCE * (1 - fraction);
+  function stopActiveTimer() {
+    if (!activeTimer) return;
+    const todo = todos.find(t => t.id === activeTimer.id);
+    if (todo) {
+      todo.elapsedSeconds = (todo.elapsedSeconds || 0) + (Date.now() - activeTimer.startedAt) / 1000;
+      saveTodos();
+    }
+    activeTimer = null;
+    saveActiveTimer();
+    renderTodos();
   }
 
-  function tick() {
-    if (remainingSeconds > 0) {
-      remainingSeconds--;
-      updateDisplay();
+  function toggleTaskTimer(id) {
+    if (activeTimer && activeTimer.id === id) {
+      stopActiveTimer();
     } else {
-      pauseTimer();
-      timerDisplay.textContent = "Done!";
+      startTaskTimer(id);
     }
   }
 
-  function startTimer() {
-    if (isRunning) return;
-    isRunning = true;
-    startPauseBtn.textContent = 'Pause';
-    intervalId = setInterval(tick, 1000);
+  function manageTickInterval() {
+    if (activeTimer && !tickIntervalId) {
+      tickIntervalId = setInterval(tickActiveTimer, 1000);
+    } else if (!activeTimer && tickIntervalId) {
+      clearInterval(tickIntervalId);
+      tickIntervalId = null;
+    }
   }
 
-  function pauseTimer() {
-    isRunning = false;
-    startPauseBtn.textContent = 'Start';
-    clearInterval(intervalId);
+  function tickActiveTimer() {
+    if (!activeTimer) return;
+    const todo = todos.find(t => t.id === activeTimer.id);
+    if (!todo) return;
+    const label = todoList.querySelector(`[data-timer-label="${activeTimer.id}"]`);
+    if (label) label.textContent = formatElapsed(liveElapsedFor(todo));
   }
 
-  function resetTimer() {
-    pauseTimer();
-    remainingSeconds = totalSeconds;
-    updateDisplay();
-  }
-
-  startPauseBtn.addEventListener('click', () => {
-    isRunning ? pauseTimer() : startTimer();
-  });
-
-  resetBtn.addEventListener('click', resetTimer);
-
-  presetButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      presetButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      totalSeconds = parseInt(btn.dataset.min, 10) * 60;
-      resetTimer();
-    });
-  });
-
-  ringProgress.style.strokeDasharray = CIRCUMFERENCE;
-  updateDisplay();
+  renderTodos();
 
   // ---------- PWA: service worker + install prompt ----------
   if ('serviceWorker' in navigator) {
@@ -1015,6 +1012,14 @@
   });
 
   applyTheme();
+
+  // ---------- Calendar section collapse ----------
+  const calToggleBtn = document.getElementById('calToggleBtn');
+  const calendarSection = document.getElementById('calendarSection');
+
+  calToggleBtn.addEventListener('click', () => {
+    calendarSection.hidden = !calendarSection.hidden;
+  });
 
   // ---------- Google Calendar connection ----------
   const CAL_CLIENT_ID_KEY = 'dailystack_cal_client_id';
